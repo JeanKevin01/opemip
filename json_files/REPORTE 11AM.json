@@ -1,0 +1,4564 @@
+{
+  "name": "REPORTE 10AM",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1792,
+        160
+      ],
+      "id": "e12591f9-0aa8-4aeb-bac4-74986cce6e79",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        -96
+      ],
+      "id": "c7ab3283-8caf-4177-bdbc-b41012ece86e",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "Operador",
+              "value": "={{ $json.Operador }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        576,
+        -112
+      ],
+      "id": "28d41dd7-00f1-41da-b8b1-b14b37e61269",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        752,
+        -112
+      ],
+      "id": "94c2c77d-2f9d-4980-b60c-d2895174a431",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1425608913,
+          "mode": "list",
+          "cachedResultName": "MAQ-NUEV",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=1425608913"
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        -96
+      ],
+      "id": "5928c615-1c56-4d94-8c96-525e4f9fd242",
+      "name": "MAQ-NUEV",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -1536
+      ],
+      "id": "d1b72668-95f8-48e3-aadd-e46cdc101dfc",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "Operador",
+              "value": "={{ $json.Operador }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -1552
+      ],
+      "id": "2045523b-537a-4a18-91cb-0b74ef011f18",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -1552
+      ],
+      "id": "4f3f231a-078e-445f-94b8-85cc04e080ca",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 332664368,
+          "mode": "list",
+          "cachedResultName": "RETRO OPE-103",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=332664368"
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -1536
+      ],
+      "id": "028085a3-289c-4444-a5a8-5ca331a47f0d",
+      "name": "RETRO OPE-103",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -1280
+      ],
+      "id": "6abf4f88-e3f4-433a-99ba-5408c651637b",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "Operador",
+              "value": "={{ $json.Operador }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -1296
+      ],
+      "id": "b8d69994-fd92-4fe1-a0b0-181571a1c09b",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -1296
+      ],
+      "id": "58ed844c-7f9a-477d-844b-63ffbe927c4f",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -1072
+      ],
+      "id": "4033f7fb-559f-4c48-b269-bbb522a64d20",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "Operador",
+              "value": "={{ $json.Operador }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -1088
+      ],
+      "id": "33cd89a5-1f33-4e88-81e8-6438699e0740",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -1088
+      ],
+      "id": "359088fe-4803-496b-8111-6d597c869624",
+      "name": "Aggregate3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -880
+      ],
+      "id": "e4ecff5a-223c-44ba-823d-9af9a1136b49",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "Operador",
+              "value": "={{ $json.Operador }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -896
+      ],
+      "id": "ddd0f388-9a8e-4e1f-b602-82963ebc2e71",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -896
+      ],
+      "id": "8bb1f2a2-f932-4419-8ee6-80c27e411d3d",
+      "name": "Aggregate4"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "CAR.FRO. OPE-104",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=0"
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -1280
+      ],
+      "id": "3c4c6854-77dc-4606-aa56-29aa3e85033f",
+      "name": "CAR.FRO. OPE-104",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 829788020,
+          "mode": "list",
+          "cachedResultName": "CAR.FRO. OPE-166",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=829788020"
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -1072
+      ],
+      "id": "00110e50-6a74-458e-9a3e-2104f2b55bf5",
+      "name": "CAR.FRO. OPE-166",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 92587680,
+          "mode": "list",
+          "cachedResultName": "MINI ORU. OPE-170",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=92587680"
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -880
+      ],
+      "id": "9f343833-a6e5-4150-b9bd-8f70570c9c21",
+      "name": "MINI ORU. OPE-170",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -704
+      ],
+      "id": "ce624c76-1726-4600-a230-3821ff03935e",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "Operador",
+              "value": "={{ $json.Operador }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -720
+      ],
+      "id": "617d6ef4-1b69-4b38-ac43-1f2f7947c16b",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -720
+      ],
+      "id": "dd6bbcdf-f7fc-4da3-ae87-619c15f1dbf5",
+      "name": "Aggregate5"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 73085606,
+          "mode": "list",
+          "cachedResultName": "CISTERNA OPE-216",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=73085606"
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -704
+      ],
+      "id": "f6059940-f16a-4cc3-a105-23b6c3b1baab",
+      "name": "CISTERNA OPE-216",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        -512
+      ],
+      "id": "795c4232-2bf3-4aca-a1b4-e6cea6541605",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "Operador",
+              "value": "={{ $json.Operador }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -528
+      ],
+      "id": "89ffbb52-3801-46be-b366-f6931e5a84c6",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -528
+      ],
+      "id": "a7cb7513-f3c5-4caf-b178-7a88bcf209ce",
+      "name": "Aggregate6"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 890534632,
+          "mode": "list",
+          "cachedResultName": "RODILLO DYN OP-XXX",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=890534632"
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -512
+      ],
+      "id": "87964ded-ee6b-42a8-99ed-50d16a85e962",
+      "name": "RODILLO DYN OP-XXX",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        -288
+      ],
+      "id": "6622fbcd-edee-467c-b3a1-8959d434339f",
+      "name": "If7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "Operador",
+              "value": "={{ $json.Operador }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        576,
+        -304
+      ],
+      "id": "17ce7b26-d546-4142-b1c6-33fa3c13bc86",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        752,
+        -304
+      ],
+      "id": "6ff8e635-8950-4a96-aaa6-5bb0ef9e21df",
+      "name": "Aggregate7"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1640582060,
+          "mode": "list",
+          "cachedResultName": "RODILLO BOM OPE-XXX",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=1640582060"
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        -288
+      ],
+      "id": "73838b4c-36e1-453d-9cf2-115d05959047",
+      "name": "RODILLO BOM OPE-XXX",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 8
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1232,
+        -944
+      ],
+      "id": "979a0b02-1277-4ca0-aefa-72194a0f77eb",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allNames = [];\n\n// PARTE 1: Extrae todos los nombres de la estructura compleja (esto ya lo teníamos)\nfor (const item of $input.all()) {\n  if (item.json.data && Array.isArray(item.json.data)) {\n    for (const subItem of item.json.data) {\n      if (subItem.Operador) {\n        allNames.push(subItem.Operador);\n      }\n    }\n  }\n}\n\n// PARTE 2: Une la lista de nombres con el formato que quieres\n// Añade una coma a cada nombre y luego los une con un salto de línea\nconst formattedString = allNames.map(name => name + ',').join('\\n');\n\n// PARTE 3: Devuelve un único ítem con el resultado final\nreturn [{ json: { lista_formateada: formattedString } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        48
+      ],
+      "id": "e3a9d578-15e1-4fe0-988c-9bee5173de36",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "content": "## OPERADORES",
+        "height": 1824,
+        "width": 928
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        96,
+        -1760
+      ],
+      "typeVersion": 1,
+      "id": "e0d2c1fb-a508-4576-a0c7-cea4067336db",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        448
+      ],
+      "id": "b9d85aef-b4c1-409e-bb19-f87756db6102",
+      "name": "If8"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        432
+      ],
+      "id": "9abdfa5f-e643-4bca-98cf-b7efee9e5994",
+      "name": "Edit Fields8"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        432
+      ],
+      "id": "7cc1935a-884a-4800-aa7c-78072d82121e",
+      "name": "Aggregate8"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "OPE-002",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        448
+      ],
+      "id": "cb4692cc-878b-43b0-8f5d-625ab7e38bde",
+      "name": "OPE-002",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        608
+      ],
+      "id": "743fa767-17f7-422c-a273-05e9abacb2b3",
+      "name": "If9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        592
+      ],
+      "id": "3ac79eab-2f09-4a52-aa43-e15338f940af",
+      "name": "Edit Fields9"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        592
+      ],
+      "id": "1c45d65c-e555-4155-b296-dea6fbde602d",
+      "name": "Aggregate9"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1467947424,
+          "mode": "list",
+          "cachedResultName": "OPE-008",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1467947424"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        608
+      ],
+      "id": "8230be04-d228-43cb-b26c-9275f49ada0a",
+      "name": "OPE-008",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        784
+      ],
+      "id": "44ed861f-25b7-4d8c-85ff-e67f7a73f5c1",
+      "name": "If10"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        768
+      ],
+      "id": "8d1ddbb8-5a8b-400d-ba2d-558d534b029e",
+      "name": "Edit Fields10"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        768
+      ],
+      "id": "2bb9cb64-f3e3-4c99-84ea-b7d5f266318b",
+      "name": "Aggregate10"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1075220594,
+          "mode": "list",
+          "cachedResultName": "OPE-009",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1075220594"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        784
+      ],
+      "id": "5dfdd7e6-e8c5-4f40-8c3e-32aaa4cc7b94",
+      "name": "OPE-009",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        944
+      ],
+      "id": "696b27ba-5085-475d-ad4d-6fa555d0d34e",
+      "name": "If11"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        928
+      ],
+      "id": "570d2f03-02ea-4927-b532-351eef4486f5",
+      "name": "Edit Fields11"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        928
+      ],
+      "id": "88da81e4-2a25-49ed-b6b0-2b1dbfde7097",
+      "name": "Aggregate11"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1924923265,
+          "mode": "list",
+          "cachedResultName": "OPE-010",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1924923265"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        944
+      ],
+      "id": "91ee4c33-8d52-4032-b192-155a29010b99",
+      "name": "OPE-010",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        1104
+      ],
+      "id": "d3ed7a0a-f818-4749-95e0-d06b6c896f2c",
+      "name": "If12"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        1088
+      ],
+      "id": "74a16efc-959c-4271-a51f-86147370c89c",
+      "name": "Edit Fields12"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        1088
+      ],
+      "id": "390e3944-e8e2-4162-be01-e07d2217b92d",
+      "name": "Aggregate12"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1567786942,
+          "mode": "list",
+          "cachedResultName": "OPE-020",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1567786942"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        1104
+      ],
+      "id": "242d4040-ae38-4947-bdfc-70dedbd586fa",
+      "name": "OPE-020",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        1264
+      ],
+      "id": "41c95f9d-afae-4d38-bee8-f9f9a27e65a4",
+      "name": "If13"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        1248
+      ],
+      "id": "9df6b177-bea7-4998-b9cb-2e082441730d",
+      "name": "Edit Fields13"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        1248
+      ],
+      "id": "63607f07-72e5-4f44-99b8-c256e3ef0d89",
+      "name": "Aggregate13"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 126311293,
+          "mode": "list",
+          "cachedResultName": "OPE-034",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=126311293"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        1264
+      ],
+      "id": "6cef6bfb-c34e-414e-8bb2-95adcd0069cf",
+      "name": "OPE-034",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        1424
+      ],
+      "id": "166109b4-84ae-4772-af76-4cea37269481",
+      "name": "If14"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        1408
+      ],
+      "id": "ee2dd6af-ec28-430e-9e5f-8b841821c41b",
+      "name": "Edit Fields14"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        1408
+      ],
+      "id": "076ead5c-5916-4705-aa15-f1ded73a7305",
+      "name": "Aggregate14"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1329469114,
+          "mode": "list",
+          "cachedResultName": "OPE-036",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1329469114"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        1424
+      ],
+      "id": "2f8bf64c-f775-40df-b97b-5e2419e25631",
+      "name": "OPE-036",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        1584
+      ],
+      "id": "e90362e5-63aa-49d0-9544-43cf38fe082a",
+      "name": "If15"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        1568
+      ],
+      "id": "bb8f9031-9bc2-420a-8c0c-f52f52a964d0",
+      "name": "Edit Fields15"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        1568
+      ],
+      "id": "a26624ed-3172-4a87-81f8-8b28186ba30b",
+      "name": "Aggregate15"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1489542602,
+          "mode": "list",
+          "cachedResultName": "OPE-056",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1489542602"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        1584
+      ],
+      "id": "c61d5c77-4b27-43e2-8537-730511371339",
+      "name": "OPE-056",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        1744
+      ],
+      "id": "0bff6fa0-043b-45bd-be00-591c177adc5f",
+      "name": "If16"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        1728
+      ],
+      "id": "b0e45d75-7e40-41e3-97a0-eb943f1e70db",
+      "name": "Edit Fields16"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        1728
+      ],
+      "id": "70cb1e3b-a4ef-436e-b453-6f069ecbb0b8",
+      "name": "Aggregate16"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1455286325,
+          "mode": "list",
+          "cachedResultName": "OPE- 066",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1455286325"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        1744
+      ],
+      "id": "7bc21174-e890-46cb-8ec4-1b7bdf4d4a98",
+      "name": "OPE-66",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        1920
+      ],
+      "id": "c7e44b2e-868a-4573-82c3-82801e1f3b3b",
+      "name": "If17"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        1904
+      ],
+      "id": "4eb07d58-d035-477f-9609-cc31fa2a5bae",
+      "name": "Edit Fields17"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        1904
+      ],
+      "id": "ab289588-7f2c-46ba-950f-9adbe7e2aabc",
+      "name": "Aggregate17"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 363188827,
+          "mode": "list",
+          "cachedResultName": "OPE-068 A",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=363188827"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        1920
+      ],
+      "id": "2b67745c-d7b9-4b4d-92ed-f1ceb00ab914",
+      "name": "OPE-068 A",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        2080
+      ],
+      "id": "bfdaa385-2f9e-42e8-b747-65ef9f0669f6",
+      "name": "If18"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        2064
+      ],
+      "id": "c010bbf4-6039-4e69-acb8-7b83753f42b3",
+      "name": "Edit Fields18"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        2064
+      ],
+      "id": "e259db79-3f5f-4f2c-9239-e36b8ec49d26",
+      "name": "Aggregate18"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1645112712,
+          "mode": "list",
+          "cachedResultName": "OPE- 068 B",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1645112712"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        2080
+      ],
+      "id": "cd425d93-8ea3-42d7-ac63-b9cd910dd4f0",
+      "name": "OPE-068 B",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        2240
+      ],
+      "id": "382f418b-cc80-4b80-a743-3050ab7211e1",
+      "name": "If19"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        2224
+      ],
+      "id": "9a6f8ce7-6b08-4db0-9064-ac22fbf8b441",
+      "name": "Edit Fields19"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        2224
+      ],
+      "id": "e3154238-f103-40ec-851f-53a2e7e7f355",
+      "name": "Aggregate19"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 339725835,
+          "mode": "list",
+          "cachedResultName": "OPE- 084",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=339725835"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        2240
+      ],
+      "id": "934cf7d4-133c-459e-9d78-4afdc5c03147",
+      "name": "OPE-084",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        2400
+      ],
+      "id": "a33526ab-cf6a-406f-9bbe-e9c0b4104f69",
+      "name": "If20"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        2384
+      ],
+      "id": "f5476c2c-f21d-40bb-a2b4-2d4bd1c925f7",
+      "name": "Edit Fields20"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        2384
+      ],
+      "id": "b02b4a08-f2b7-4a45-b84e-f6b12a781cfa",
+      "name": "Aggregate20"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 139582198,
+          "mode": "list",
+          "cachedResultName": "OPE-086",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=139582198"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        2400
+      ],
+      "id": "832a7862-5e50-4797-82bb-d1df2800ca9d",
+      "name": "OPE-086",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        2544
+      ],
+      "id": "b69d0a31-fdcd-4a85-a9a7-7257eb0e6bba",
+      "name": "If21"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        2528
+      ],
+      "id": "aad3fa71-695e-4a65-936f-10cb287565dd",
+      "name": "Edit Fields21"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        2528
+      ],
+      "id": "07cb296f-6e4b-4a49-8164-64d88e541e76",
+      "name": "Aggregate21"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 56992696,
+          "mode": "list",
+          "cachedResultName": "OPE-100",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=56992696"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        2544
+      ],
+      "id": "3300b76f-68df-4612-ae89-52a752a0680d",
+      "name": "OPE-100",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        2704
+      ],
+      "id": "c24c20d1-828e-4ee2-927d-7c13b80e3141",
+      "name": "If22"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        2688
+      ],
+      "id": "c71c6ebe-15ce-4c82-98e9-7509a6d47795",
+      "name": "Edit Fields22"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        2688
+      ],
+      "id": "812f6425-86c4-4c75-8f91-f2d0718762a3",
+      "name": "Aggregate22"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1238559096,
+          "mode": "list",
+          "cachedResultName": "OPE-102",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1238559096"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        2704
+      ],
+      "id": "c4d9834f-83d3-41ec-9861-c308a260752f",
+      "name": "OPE-102",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        2864
+      ],
+      "id": "e997348e-39a0-45dc-9729-59a47b050798",
+      "name": "If23"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        2848
+      ],
+      "id": "2e6a8538-d827-4de5-a5bf-71ebdd992412",
+      "name": "Edit Fields23"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        2848
+      ],
+      "id": "ad703928-d80e-404a-b44f-64c0dfbe55c3",
+      "name": "Aggregate23"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1540790385,
+          "mode": "list",
+          "cachedResultName": "OPE-106",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1540790385"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        2864
+      ],
+      "id": "a8e82fe5-ff2f-4103-bf1e-2cdc5762f741",
+      "name": "OPE-106",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "897da725-6a94-4720-bab8-385daccbfe8b",
+              "leftValue": "={{ DateTime.now().setZone('America/Lima').toFormat('dd/MM/yyyy') }}",
+              "rightValue": "={{ $json['Fecha enviada'] }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3595e3c0-fe5e-4024-9639-5a6eeeda1b3b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 5.3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "e1c6920c-ce14-4a16-99a4-bc47f46dfc1b",
+              "leftValue": "={{ Number($json['Hora enviada'].replace(':', '.')) }}",
+              "rightValue": 11,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        3024
+      ],
+      "id": "229aface-8179-4f61-a260-68f4d14d9a31",
+      "name": "If24"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64336dbb-2e8f-4368-a8ee-8f079451aa2b",
+              "name": "CONDUCTOR",
+              "value": "={{ $json.Conductor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        3008
+      ],
+      "id": "94d9d4a3-7c65-4710-b309-8f28dd359bda",
+      "name": "Edit Fields24"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        768,
+        3008
+      ],
+      "id": "fd608f04-4e20-477c-8873-ead1f581fb39",
+      "name": "Aggregate24"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 51743893,
+          "mode": "list",
+          "cachedResultName": "OPE-SN ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=51743893"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        3024
+      ],
+      "id": "954ef8da-63c9-4ee9-b922-e83d56afc821",
+      "name": "OPE-SN",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 10
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1184,
+        608
+      ],
+      "id": "69895f33-5104-4a86-a9eb-b89e4c362af5",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allNames = [];\n\n// PARTE 1: Extrae todos los nombres de la estructura compleja\nfor (const item of $input.all()) {\n  if (item.json.data && Array.isArray(item.json.data)) {\n    for (const subItem of item.json.data) {\n      // --- CAMBIO AQUÍ ---\n      // Buscamos el campo \"CONDUCTOR\"\n      if (subItem.CONDUCTOR) {\n        // --- Y CAMBIO AQUÍ ---\n        // Añadimos el valor de \"CONDUCTOR\" a la lista\n        allNames.push(subItem.CONDUCTOR);\n      }\n    }\n  }\n}\n\n// PARTE 2: Une la lista de nombres con el formato que quieres\nconst formattedString = allNames.map(name => name + ',').join('\\n');\n\n// PARTE 3: Devuelve un único ítem con el resultado final\nreturn [{ json: { lista_formateada: formattedString } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        256
+      ],
+      "id": "2c73d357-3b93-41f0-8f9d-bb7735c7314e",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "numberInputs": 7
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1216,
+        2480
+      ],
+      "id": "b4445be5-9691-4bcd-a00b-78af08b27eee",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1504,
+        1584
+      ],
+      "id": "2d2089b5-da50-4984-8420-1bff99ca79c8",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "content": "## CONDUCTORES",
+        "height": 3040,
+        "width": 928,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        96,
+        208
+      ],
+      "typeVersion": 1,
+      "id": "bcafa42d-dd52-45ed-a0cf-fb237afff73f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ed75c80-d6f7-4df5-8138-2f1fa1d75bfc",
+              "name": "OPERADORES",
+              "value": "={{'OPERADORES' }}",
+              "type": "string"
+            },
+            {
+              "id": "0ce3b794-6108-451c-a4f8-aa88bf515f33",
+              "name": "lista_OPERADORES",
+              "value": "={{ $json.data[0].lista_formateada }}",
+              "type": "string"
+            },
+            {
+              "id": "bff13e21-e834-4714-8c59-7b1c92f2b40a",
+              "name": "CONDUCTORES",
+              "value": "={{'CONDUCTORES' }}",
+              "type": "string"
+            },
+            {
+              "id": "2b422b13-7a83-496b-8efb-b65bb03a0122",
+              "name": "lista_CONDUCTORES",
+              "value": "={{ $json.data[1].lista_formateada }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2496,
+        144
+      ],
+      "id": "dc7f8c3c-a31a-4a21-8ec6-7123c6365ec2",
+      "name": "Edit Fields26"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2080,
+        144
+      ],
+      "id": "0d4ccabc-af46-40ed-815a-03a08b522456",
+      "name": "Merge5"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2288,
+        144
+      ],
+      "id": "e22127dd-d95b-4b4e-9136-061ee64068ce",
+      "name": "Aggregate25"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "OPE-002",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-008",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-009",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-010",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-020",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-034",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-036",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-056",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-66",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-068 A",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-068 B",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-084",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-086",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-100",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-102",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-106",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OPE-SN",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RETRO OPE-103",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CAR.FRO. OPE-104",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CAR.FRO. OPE-166",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MINI ORU. OPE-170",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CISTERNA OPE-216",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RODILLO DYN OP-XXX",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RODILLO BOM OPE-XXX",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MAQ-NUEV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 7
+          }
+        ]
+      ]
+    },
+    "MAQ-NUEV": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RETRO OPE-103": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Aggregate3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Aggregate4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CAR.FRO. OPE-104": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CAR.FRO. OPE-166": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MINI ORU. OPE-170": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Aggregate5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CISTERNA OPE-216": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Aggregate6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RODILLO DYN OP-XXX": {
+      "main": [
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If7": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "Aggregate7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RODILLO BOM OPE-XXX": {
+      "main": [
+        [
+          {
+            "node": "If7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Aggregate5": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Aggregate6": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Aggregate7": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Aggregate3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If8": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields8": {
+      "main": [
+        [
+          {
+            "node": "Aggregate8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-002": {
+      "main": [
+        [
+          {
+            "node": "If8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If9": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields9": {
+      "main": [
+        [
+          {
+            "node": "Aggregate9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-008": {
+      "main": [
+        [
+          {
+            "node": "If9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If10": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields10": {
+      "main": [
+        [
+          {
+            "node": "Aggregate10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-009": {
+      "main": [
+        [
+          {
+            "node": "If10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If11": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields11": {
+      "main": [
+        [
+          {
+            "node": "Aggregate11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-010": {
+      "main": [
+        [
+          {
+            "node": "If11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If12": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields12": {
+      "main": [
+        [
+          {
+            "node": "Aggregate12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-020": {
+      "main": [
+        [
+          {
+            "node": "If12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If13": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields13": {
+      "main": [
+        [
+          {
+            "node": "Aggregate13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-034": {
+      "main": [
+        [
+          {
+            "node": "If13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If14": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields14": {
+      "main": [
+        [
+          {
+            "node": "Aggregate14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-036": {
+      "main": [
+        [
+          {
+            "node": "If14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If15": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields15",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields15": {
+      "main": [
+        [
+          {
+            "node": "Aggregate15",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-056": {
+      "main": [
+        [
+          {
+            "node": "If15",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If16": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields16": {
+      "main": [
+        [
+          {
+            "node": "Aggregate16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-66": {
+      "main": [
+        [
+          {
+            "node": "If16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If17": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields17",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields17": {
+      "main": [
+        [
+          {
+            "node": "Aggregate17",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-068 A": {
+      "main": [
+        [
+          {
+            "node": "If17",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If18": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields18",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields18": {
+      "main": [
+        [
+          {
+            "node": "Aggregate18",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-068 B": {
+      "main": [
+        [
+          {
+            "node": "If18",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If19": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields19",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields19": {
+      "main": [
+        [
+          {
+            "node": "Aggregate19",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-084": {
+      "main": [
+        [
+          {
+            "node": "If19",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If20": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields20",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields20": {
+      "main": [
+        [
+          {
+            "node": "Aggregate20",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-086": {
+      "main": [
+        [
+          {
+            "node": "If20",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If21": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields21": {
+      "main": [
+        [
+          {
+            "node": "Aggregate21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-100": {
+      "main": [
+        [
+          {
+            "node": "If21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If22": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields22",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields22": {
+      "main": [
+        [
+          {
+            "node": "Aggregate22",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-102": {
+      "main": [
+        [
+          {
+            "node": "If22",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If23": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields23",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields23": {
+      "main": [
+        [
+          {
+            "node": "Aggregate23",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-106": {
+      "main": [
+        [
+          {
+            "node": "If23",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If24": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields24",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields24": {
+      "main": [
+        [
+          {
+            "node": "Aggregate24",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OPE-SN": {
+      "main": [
+        [
+          {
+            "node": "If24",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate8": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate9": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Aggregate10": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Aggregate11": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Aggregate12": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Aggregate13": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Aggregate14": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Aggregate15": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 7
+          }
+        ]
+      ]
+    },
+    "Aggregate16": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 8
+          }
+        ]
+      ]
+    },
+    "Aggregate17": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 9
+          }
+        ]
+      ]
+    },
+    "Aggregate18": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate19": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Aggregate20": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Aggregate21": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Aggregate22": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Aggregate23": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Aggregate24": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge5": {
+      "main": [
+        [
+          {
+            "node": "Aggregate25",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate25": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields26",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ecac9405-3ad5-4599-b93f-827330cbb638",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "78433393f994bb46658b62aa0311e8ce3097d42d4febcbe84a2408caf59f9e19"
+  },
+  "id": "F1VYkF8UBQ2vDkEL",
+  "tags": []
+}
