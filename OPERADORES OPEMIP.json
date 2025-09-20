@@ -1,0 +1,3479 @@
+{
+  "name": "OPERADORES OPEMIP",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "IMAGEN",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "ENVIAR IMAGEN",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -464,
+        80
+      ],
+      "id": "1a985b06-837c-4a6f-95e7-51c2ede91bf1",
+      "name": "On form submission",
+      "webhookId": "91e2062e-fb32-46d3-88be-b9c21ef47297"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Objetivo\nTu misión es actuar como un sistema de reconocimiento óptico de caracteres (OCR) avanzado, especializado en la extracción de datos de formularios manuscritos. Analiza la imagen adjunta de un \"PARTE DIARIO\" de OPEMIP S.A.C. y extrae toda la información en un objeto JSON estructurado, siguiendo meticulosamente las reglas detalladas a continuación.\n\nEsquema de Salida JSON y Reglas de Extracción\nTu única salida debe ser un objeto JSON sin formato adicional (como ```json) ni texto introductorio. Adhiérete estrictamente a esta estructura y a las reglas para cada campo.\n\nJSON\n\n{\n  \"identificacion\": {\n    \"numero_parte\": \"string\",\n    \"supervisor\": \"string\",\n    \"equipo\": \"string\",\n    \"operador_chofer\": \"string\"\n  },\n  \"operacion\": {\n    \"turno\": \"string | null\",\n    \"uo\": \"string | null\",\n    \"fecha\": {\n      \"dia\": \"string | null\",\n      \"mes\": \"string | null\",\n      \"ano\": \"string | null\"\n    },\n    \"area\": \"string | null\",\n    \"labor\": \"string | null\",\n    \"origen\": \"string | null\",\n    \"destino\": \"string | null\",\n    \"viajes\": \"string | null\"\n  },\n  \"horometros\": {\n    \"inicio\": \"number | null\",\n    \"final\": \"number | null\",\n    \"total_calculado\": \"number | null\"\n  },\n  \"descripcion_trabajo\": {\n    \"trabajos_realizados\": \"string | null\",\n    \"observaciones\": \"string | null\"\n  },\n  \"consumo\": {\n      \"cantidad\": \"number | null\",\n      \"hora_horometro\": \"string | null\"\n  }\n}\nInstrucciones Detalladas por Campo\nidentificacion.numero_parte: Localiza el número preimpreso junto a \"Nº\". Transcríbelo como string, conservando los ceros iniciales.\n\nidentificacion.supervisor: Transcribe el nombre manuscrito del SUPERVISOR.\n\nidentificacion.equipo: Transcribe la descripción completa de la maquinaria en el campo EQUIPO.\n\nidentificacion.operador_chofer: Transcribe el nombre completo del OPERADOR/CHOFER. Presta especial atención a la caligrafía.\n\noperacion.turno: Identifica y transcribe el carácter marcado en la casilla TURNO.\n\noperacion.uo: Transcribe el texto manuscrito en el campo U.O. (ej: \"SMCV\").\n\noperacion.fecha: Extrae el día, mes y año de sus respectivas casillas y asígnalos a los subcampos dia, mes, y ano.\n\noperacion.area, operacion.labor, operacion.origen, operacion.destino, operacion.viajes: Transcribe el contenido de cada uno de estos campos.\n\nhorometros.inicio: Extrae el valor numérico del HOROMETRO INICIO. El valor debe ser de tipo number.\n\nhorometros.final: Extrae el valor numérico del HOROMETRO FINAL. El valor debe ser de tipo number.\n\nhorometros.total_calculado: NO TRANSCRIBAS ESTE VALOR. Debes calcularlo tú mismo restando: (horometros.final - horometros.inicio). El resultado debe ser un number redondeado a un decimal.\n\ndescripcion_trabajo.trabajos_realizados: Transcribe íntegramente y con precisión el texto manuscrito en la sección TRABAJOS REALIZADOS.\n\ndescripcion_trabajo.observaciones: Transcribe el texto manuscrito de la sección OBSERVACIONES.\n\nconsumo: Transcribe los valores de la sección de combustible en los campos correspondientes.\n\nRegla Universal para Campos Vacíos\nSi CUALQUIER campo en el formulario está en blanco, su valor correspondiente en el JSON DEBE ser null. No lo omitas ni uses un string vacío (\"\").",
+        "options": {
+          "systemMessage": "Actúas como un sistema de OCR (Reconocimiento Óptico de Caracteres) de alta precisión, especializado en procesar formularios industriales para la compañía minera OPEMIP en Perú.\n\nTu conocimiento se centra exclusivamente en el documento \"PARTE DIARIO\". Entiendes que este formulario registra la actividad diaria de maquinaria pesada, incluyendo datos de operación, fechas, responsables y tareas. Tu objetivo es la extracción de datos sin errores.",
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        80
+      ],
+      "id": "5882982d-be18-438c-8ed5-7d7b0ae94353",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        272
+      ],
+      "id": "3bbb3045-cf80-41ae-b57b-e452a62b6ae6",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "DI308d3nQE8CpyrF",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "numero_parte",
+              "description": "El número identificador del parte diario, por ejemplo: \"004718\"",
+              "required": true
+            },
+            {
+              "name": "supervisor",
+              "description": "El nombre completo del supervisor a cargo.",
+              "required": true
+            },
+            {
+              "name": "equipo",
+              "description": "La descripción del equipo o maquinaria utilizada.",
+              "required": true
+            },
+            {
+              "name": "operador_chofer",
+              "description": "El nombre completo del operador o chofer.",
+              "required": true
+            },
+            {
+              "name": "horometro_inicio",
+              "type": "number",
+              "description": "El valor NUMÉRICO del horómetro al iniciar. Debe ser un número.",
+              "required": true
+            },
+            {
+              "name": "horometro_final",
+              "type": "number",
+              "description": "El valor NUMÉRICO del horómetro al finalizar. Debe ser un número.",
+              "required": true
+            },
+            {
+              "name": "turno",
+              "description": "La letra o código del turno, por ejemplo: \"A\" o \"B\" o las palabras dia o noche",
+              "required": true
+            },
+            {
+              "name": "area",
+              "description": "El código o nombre del área de trabajo.",
+              "required": true
+            },
+            {
+              "name": "labor",
+              "description": "La descripción de la labor principal.",
+              "required": true
+            },
+            {
+              "name": "trabajos realizados",
+              "description": "Descripción detallada de los trabajos que se realizaron.",
+              "required": true
+            },
+            {
+              "name": "dia",
+              "description": "El día del mes como un número entero.",
+              "required": true
+            },
+            {
+              "name": "mes",
+              "description": "El mes como un número entero",
+              "required": true
+            },
+            {
+              "name": "año",
+              "description": "El año como un número entero",
+              "required": true
+            },
+            {
+              "name": "observaciones",
+              "description": "Campo de texto libre para cualquier anotación, incidencia o comentario",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        80
+      ],
+      "id": "168a6c1e-208f-43b5-952b-7b1556c99747",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-nano",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-nano"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        272
+      ],
+      "id": "980d1326-de28-44ed-8f20-39f7b9c793bd",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "DI308d3nQE8CpyrF",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe166f26-4e32-45a7-936d-04350a9fd944",
+              "name": "N° Parte",
+              "value": "={{ $json.output.numero_parte }}",
+              "type": "string"
+            },
+            {
+              "id": "1e97af52-3c47-4a37-b288-bee494547fa8",
+              "name": "Supervisor",
+              "value": "={{ $json.output.supervisor }}",
+              "type": "string"
+            },
+            {
+              "id": "3e6209c1-b5e7-4ffa-be23-9c0b55068449",
+              "name": "Equipo",
+              "value": "={{ $json.output.equipo }}",
+              "type": "string"
+            },
+            {
+              "id": "1e1caa2d-22fd-41dd-ad87-1e7ebccb2884",
+              "name": "Operador_chofer",
+              "value": "={{ $json.output.operador_chofer }}",
+              "type": "string"
+            },
+            {
+              "id": "b060667b-7880-4fc6-9986-bfe2fc7bd236",
+              "name": "Homerometro_inicio",
+              "value": "={{ $json.output.horometro_inicio }}",
+              "type": "number"
+            },
+            {
+              "id": "107f312d-6ae5-42c7-9689-1fb36355aafa",
+              "name": "Horometro_final",
+              "value": "={{ $json.output.horometro_final }}",
+              "type": "number"
+            },
+            {
+              "id": "bb1fedc0-5b1c-4b0b-9caa-25da6f89ef57",
+              "name": "Area",
+              "value": "={{ $json.output.area }}",
+              "type": "string"
+            },
+            {
+              "id": "f759d6cc-e931-4620-9ed6-006a203f91b0",
+              "name": "Labor",
+              "value": "={{ $json.output.labor }}",
+              "type": "string"
+            },
+            {
+              "id": "57a87baf-7e43-4400-a4cb-9b698a495817",
+              "name": "Trabajo realizado",
+              "value": "={{ $json.output['trabajos realizados'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f4a35870-b1e2-41ab-8bf4-df8c6671ab5c",
+              "name": "FECHA ENVIADA",
+              "value": "={{ DateTime.now().toFormat('dd/MM/yyyy') }}",
+              "type": "string"
+            },
+            {
+              "id": "30ef9f87-35bf-4e9d-b7b0-d118c980b236",
+              "name": "FECHA INDICADA",
+              "value": "={{ $json.output.dia }}/{{ $json.output.mes }}/{{ $json.output['año'] }}",
+              "type": "string"
+            },
+            {
+              "id": "be72d47e-4e2c-4e4f-ab79-c587c34ad3a2",
+              "name": "Observaciones",
+              "value": "={{ $json.output.observaciones }}",
+              "type": "string"
+            },
+            {
+              "id": "1cb8b9dd-2ec8-4425-827c-db21bdc84d61",
+              "name": "Turno",
+              "value": "={{ $json.output.turno }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        80
+      ],
+      "id": "79f17a02-6076-4630-b987-1e8c3f707e23",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Equipo }}",
+                    "rightValue": "arg",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    },
+                    "id": "52527b88-f0a2-4bbb-882d-1496e866c056"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "CARGADOR FRONTAL"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "703d7583-d379-43ea-9d66-61c32adc522c",
+                    "leftValue": "={{ $json.Equipo }}",
+                    "rightValue": "etro",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "RETROCARGADOR"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "be6122a4-21a6-4dd9-9fc7-af1cf8b051bd",
+                    "leftValue": "={{ $json.Equipo }}",
+                    "rightValue": "ini",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "MINI ORUGA"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a8fd166d-e700-44c4-9acb-79d29ddeafd9",
+                    "leftValue": "={{ $json.Equipo }}",
+                    "rightValue": "ist",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "CISTERNA"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f7b7a062-bc40-4e3a-b78d-b721bc94f688",
+                    "leftValue": "={{ $json.Equipo }}",
+                    "rightValue": "odi",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "RODILLO"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        720,
+        32
+      ],
+      "id": "73cd981b-18bc-4efc-8069-5bb1c582c94b",
+      "name": "Switch",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e8a9355d-6718-4dcb-80f7-5a2bafcc9955",
+              "leftValue": "={{ $json.Equipo }}",
+              "rightValue": "104",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1296,
+        -880
+      ],
+      "id": "088f6e2e-9d71-4788-a4d9-ab0527f43de8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0571270a-65b1-4cea-80e8-4deff079428f",
+              "leftValue": "={{ $('Edit Fields').item.json.Equipo }}",
+              "rightValue": "om",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1216,
+        784
+      ],
+      "id": "e5d4cf01-9ee0-4059-a0ca-f397049e8e91",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d6bcae6d-a5b1-4215-bf4a-8b260fceb03a",
+              "leftValue": "={{ $('Edit Fields').item.json.Equipo }}",
+              "rightValue": "103",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        -400
+      ],
+      "id": "c7b4ba9f-68b4-4b51-ae32-eca08e1bbda9",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1b163620-5562-4f8c-9c57-7e4d8aff7a8e",
+              "leftValue": "={{ $('Edit Fields').item.json.Equipo }}",
+              "rightValue": "1",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1488,
+        -32
+      ],
+      "id": "8402d0cd-61ca-48de-a455-78c875877b4a",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c46682f5-e745-4690-b2fa-c109f755cefd",
+              "leftValue": "={{ $('Edit Fields').item.json.Equipo }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        320
+      ],
+      "id": "3c932916-4a84-46e3-a6c6-d73709fdda63",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "77003df1-8221-4ad9-ae26-6f58e0edc092",
+              "leftValue": "={{ $json.Equipo }}",
+              "rightValue": "166",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1472,
+        -704
+      ],
+      "id": "9e9bdcbd-ce2b-4250-bf25-22d89d527e9a",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1425608913,
+          "mode": "list",
+          "cachedResultName": "MAQ-NUEV",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=1425608913"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1728,
+        -304
+      ],
+      "id": "f96550ce-f3bd-47bd-a895-8ca9fcd184d4",
+      "name": "NUEVO",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 332664368,
+          "mode": "list",
+          "cachedResultName": "RETRO OPE-103",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=332664368"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1728,
+        -480
+      ],
+      "id": "9bdf31c8-19b1-4fd2-8737-6b6f98a36039",
+      "name": "RETRO OPE-103",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1425608913,
+          "mode": "list",
+          "cachedResultName": "MAQ-NUEV",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=1425608913"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1712,
+        -624
+      ],
+      "id": "3ca82325-e599-4ed4-ba08-b17e7f3066f8",
+      "name": "NUEVO2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "CAR.FRO. OPE-104",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        -896
+      ],
+      "id": "ae0a46c0-e243-4bf5-8476-0d2d0092fcc0",
+      "name": "CAR.FRO. OPE-104",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 829788020,
+          "mode": "list",
+          "cachedResultName": "CAR.FRO. OPE-166",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=829788020"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1696,
+        -784
+      ],
+      "id": "cb228a7a-365f-4aca-8258-4701857a69c3",
+      "name": "CAR.FRO. OPE-166",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1425608913,
+          "mode": "list",
+          "cachedResultName": "MAQ-NUEV",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=1425608913"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        64
+      ],
+      "id": "25d8251b-578f-4a5d-8e38-49c2920134b4",
+      "name": "NUEVO4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 92587680,
+          "mode": "list",
+          "cachedResultName": "MINI ORU. OPE-170",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=92587680"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1728,
+        -128
+      ],
+      "id": "1f09f1a4-adfd-426d-95a6-2887a1c314bb",
+      "name": "MINI ORU. OPE-170",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 73085606,
+          "mode": "list",
+          "cachedResultName": "CISTERNA OPE-216",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=73085606"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        256
+      ],
+      "id": "0ab29955-c153-4889-a91f-5585d64e31cf",
+      "name": "CISTERNA OPE-216",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1425608913,
+          "mode": "list",
+          "cachedResultName": "MAQ-NUEV",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=1425608913"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        432
+      ],
+      "id": "62d1bf9b-27ba-4b14-9624-af9520c8518a",
+      "name": "NUEVO5",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1425608913,
+          "mode": "list",
+          "cachedResultName": "MAQ-NUEV",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=1425608913"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        1024
+      ],
+      "id": "652c5ddd-74f5-48e3-8791-0a0674902c20",
+      "name": "NUEVO7",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1640582060,
+          "mode": "list",
+          "cachedResultName": "RODILLO BOM OPE-XXX",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=1640582060"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        656
+      ],
+      "id": "332fa052-3c85-49fd-aa70-d070b6e14de6",
+      "name": "RODILLO BOM OPE-XXX",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2afcb49d-9f0c-4f4e-88f7-11222134d7da",
+              "leftValue": "={{ $('Edit Fields').item.json.Equipo }}",
+              "rightValue": "yn",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1424,
+        880
+      ],
+      "id": "482d1840-11a1-484a-8492-b7aeb4722897",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 890534632,
+          "mode": "list",
+          "cachedResultName": "RODILLO DYN OP-XXX",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=890534632"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1744,
+        832
+      ],
+      "id": "e053f6ba-b09e-4a28-81f0-d7e8c88936b5",
+      "name": "RODILLO DYN OP-XXX",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## PROCESAMIENTO POR IA",
+        "height": 416,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -320,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "24863836-189a-4879-b620-3460b0297628",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA",
+          "mode": "list",
+          "cachedResultName": "MAQUINARIA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1425608913,
+          "mode": "list",
+          "cachedResultName": "MAQ-NUEV",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-jBoc4qOy7_6i-aBNhjwrLEoQzP_dplqoSStPWUCTRA/edit#gid=1425608913"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "N° Parte": "={{ $('Edit Fields').item.json['N° Parte'] }}",
+            "Fecha enviada": "={{ $('Edit Fields').item.json['FECHA ENVIADA'] }}",
+            "Fecha indicada": "={{ $('Edit Fields').item.json['FECHA INDICADA'] }}",
+            "Equipo": "={{ $('Edit Fields').item.json.Equipo }}",
+            "Operador": "={{ $('Edit Fields').item.json.Operador_chofer }}",
+            "Supervisor": "={{ $('Edit Fields').item.json.Supervisor }}",
+            "Horometro Inicio": "={{ $('Edit Fields').item.json.Homerometro_inicio }}",
+            "Horometro final": "={{ $('Edit Fields').item.json.Horometro_final }}",
+            "Area": "={{ $('Edit Fields').item.json.Area }}",
+            "Labor": "={{ $('Edit Fields').item.json.Labor }}",
+            "Trabajo Realizado": "={{ $('Edit Fields').item.json['Trabajo realizado'] }}",
+            "Turno": "={{ $('Edit Fields').item.json['Turno'] }}",
+            "Observaciones": "={{ $('Edit Fields').item.json['Observaciones'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "N° Parte",
+              "displayName": "N° Parte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Equipo",
+              "displayName": "Equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Operador",
+              "displayName": "Operador",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Supervisor",
+              "displayName": "Supervisor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Horometro Inicio",
+              "displayName": "Horometro Inicio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horometro final",
+              "displayName": "Horometro final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Horas",
+              "displayName": "Total Horas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Area",
+              "displayName": "Area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Labor",
+              "displayName": "Labor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Trabajo Realizado",
+              "displayName": "Trabajo Realizado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        720,
+        400
+      ],
+      "id": "3e573927-d080-4c59-ba46-8f2a253a90b2",
+      "name": "NUEVO8",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NUEVO8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "CAR.FRO. OPE-104",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "RODILLO BOM OPE-XXX",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "RETRO OPE-103",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NUEVO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "MINI ORU. OPE-170",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NUEVO4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "CISTERNA OPE-216",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NUEVO5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "CAR.FRO. OPE-166",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NUEVO2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "RODILLO DYN OP-XXX",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NUEVO7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9e5a30c9-8f78-4eff-84d4-b7a54e3233f1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "78433393f994bb46658b62aa0311e8ce3097d42d4febcbe84a2408caf59f9e19"
+  },
+  "id": "95kU4qjxv14JIjz8",
+  "tags": []
+}
