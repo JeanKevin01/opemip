@@ -1,0 +1,4503 @@
+{
+  "name": "CONDUCTORES OPEMIP",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "IMAGEN",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "ENVIAR IMAGEN",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -96,
+        64
+      ],
+      "id": "ce20f511-a122-401b-802c-24742a19382e",
+      "name": "On form submission",
+      "webhookId": "91e2062e-fb32-46d3-88be-b9c21ef47297"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Objetivo\nTu misión es actuar como un sistema de reconocimiento óptico de caracteres (OCR) avanzado, especializado en la extracción de datos de formularios de inspección. Analiza la imagen adjunta de un \"MAQUINARIAS Y EQUIPOS CHECK LIST\" de OPEMIP y extrae la información solicitada en un objeto JSON estructurado, siguiendo meticulosamente las reglas detalladas a continuación.\n\nEsquema de Salida JSON y Reglas de Extracción\nTu única salida debe ser un objeto JSON sin formato adicional (como ```json) ni texto introductorio. Adhiérete estrictamente a esta estructura y a las reglas para cada campo.\n\nJSON\n\n{\n  \"encabezado\": {\n    \"fecha\": \"string | null\",\n    \"nombre_equipo\": \"string | null\",\n    \"placa_serie\": \"string | null\",\n    \"turno\": \"string | null\"\n  },\n  \"registro_jornada\": {\n    \"hora_desde\": \"string | null\",\n    \"hora_hasta\": \"string | null\",\n    \"km_inicial\": \"number | null\",\n    \"km_final\": \"number | null\"\n  },\n  \"revision\": {\n    \"observaciones\": \"string | null\"\n  },\n  \"personal\": {\n    \"nombre_operador\": \"string | null\"\n  }\n}\nInstrucciones Detalladas por Campo\n\nencabezado.fecha: Extrae la fecha completa que se encuentra en el campo FECHA en la esquina superior izquierda.\n\nencabezado.nombre_equipo: Transcribe la descripción completa de la maquinaria que se encuentra en el campo Nombre Equipo.\n\nencabezado.placa_serie: Transcribe el valor alfanumérico del campo Placa / Serie.\n\nencabezado.turno: Localiza y transcribe el valor manuscrito en el campo Turno, ubicado en la sección superior del documento.\n\nregistro_jornada.hora_desde: Extrae la hora de inicio del campo Hora desde.\n\nregistro_jornada.hora_hasta: Extrae la hora de finalización del campo Hora hasta.\n\nregistro_jornada.km_inicial: Extrae el valor numérico del campo Horas/ km inicial. El resultado debe ser de tipo number.\n\nregistro_jornada.km_final: Extrae el valor numérico del campo Horas/ km final. El resultado debe ser de tipo number.\n\nrevision.observaciones: Transcribe íntegra y textualmente el contenido manuscrito dentro del recuadro grande de OBSERVACIONES.\n\npersonal.nombre_operador: En la parte inferior del documento, localiza la sección de firma del OPERADOR DEL EQUIPO a la izquierda, y transcribe el nombre que figura junto a Nombre:.\n\nRegla Universal para Campos Vacíos\n\nSi CUALQUIER campo en el formulario está visiblemente en blanco (como \"Horas/ km final\" en el ejemplo), su valor correspondiente en el JSON DEBE ser null. No lo omitas ni uses un string vacío (\"\").",
+        "options": {
+          "systemMessage": "Actúas como un sistema de OCR (Reconocimiento Óptico de Caracteres) de alta precisión, especializado en procesar formularios de operación y mantenimiento para la compañía minera OPEMIP en Perú.\n\nTu conocimiento abarca diferentes documentos clave de la operación, como el \"PARTE DIARIO\" y el \"MAQUINARIAS Y EQUIPOS CHECK LIST\". Reconoces que cada formulario tiene un propósito distinto (reporte de actividad, inspección de seguridad, etc.), pero todos comparten el objetivo de registrar datos cruciales.\n\nTu rol principal es seguir rigurosamente las instrucciones del \"Prompt (User Message)\" que recibes para cada tarea. El prompt te especificará siempre:\n1.  El tipo de documento que estás analizando.\n2.  La estructura JSON exacta que debes generar como salida.\n3.  Las instrucciones detalladas para localizar y extraer cada campo.\n\nTu objetivo final es la extracción de datos con la máxima precisión y fidelidad al documento original, respetando siempre el formato solicitado.",
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        64
+      ],
+      "id": "cc0b5de5-3c4e-4ca6-ba74-99c6290cfcf2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        256
+      ],
+      "id": "869404bb-72d2-4bc1-994c-39c0db37c373",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "DI308d3nQE8CpyrF",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "fecha",
+              "description": "Fecha en que se realizó el check list, en formato DD/MM/AAAA",
+              "required": true
+            },
+            {
+              "name": "nombre_equipo",
+              "description": "Nombre y código del equipo o maquinaria que fue inspeccionada",
+              "required": true
+            },
+            {
+              "name": "placa_serie",
+              "description": "Número de placa o serie de identificación único del equipo",
+              "required": true
+            },
+            {
+              "name": "turno",
+              "description": "Turno de trabajo durante el cual se hizo la inspección (ej: DIA, NOCHE, A, B)",
+              "required": true
+            },
+            {
+              "name": "hora_desde",
+              "description": "Hora de inicio de la jornada registrada en el check list, en formato HH:MM",
+              "required": true
+            },
+            {
+              "name": "hora_hasta",
+              "description": "Hora de finalización de la jornada registrada en el check list, en formato HH:MM",
+              "required": true
+            },
+            {
+              "name": "km_inicial",
+              "description": "Valor del horómetro o kilometraje registrado al inicio del turno",
+              "required": true
+            },
+            {
+              "name": "km_final",
+              "description": "Valor del horómetro o kilometraje registrado al final del turno. Puede venir vacío",
+              "required": true
+            },
+            {
+              "name": "observaciones",
+              "description": "Cualquier anotación, falla o comentario relevante sobre el estado del equipo",
+              "required": true
+            },
+            {
+              "name": "nombre_operador",
+              "description": "Nombre completo del operador o conductor que firma el check list",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        64
+      ],
+      "id": "a8f536cf-9801-4658-a261-9131cbbf3e3c",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-nano",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-nano"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        256
+      ],
+      "id": "c9fa1654-ddef-4786-8b33-2e1abce1f36a",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "DI308d3nQE8CpyrF",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8dccfb7d-d83e-47be-89c7-80cc77f74878",
+              "name": "Fecha",
+              "value": "={{ $json.output.fecha }}",
+              "type": "string"
+            },
+            {
+              "id": "88c07d8f-ffda-42f4-9107-d0e9ed4efd04",
+              "name": "Nombre equipo",
+              "value": "={{ $json.output.nombre_equipo }}",
+              "type": "string"
+            },
+            {
+              "id": "062f1cb0-bb51-4878-90a2-8a958ed6cf1a",
+              "name": "Placa Serie",
+              "value": "={{ $json.output.placa_serie }}",
+              "type": "string"
+            },
+            {
+              "id": "4e1efb76-3455-4d16-a42f-493e59ba9807",
+              "name": "Turno",
+              "value": "={{ $json.output.turno }}",
+              "type": "string"
+            },
+            {
+              "id": "9aa70589-19af-492d-9a08-0406507c21f5",
+              "name": "Hora desde",
+              "value": "={{ $json.output.hora_desde }}",
+              "type": "string"
+            },
+            {
+              "id": "4386a594-835c-4540-8f02-da0050d39759",
+              "name": "Hora hasta",
+              "value": "={{ $json.output.hora_hasta }}",
+              "type": "string"
+            },
+            {
+              "id": "7b83f989-ca02-428d-90dc-f73b9d1396b3",
+              "name": "km inicial",
+              "value": "={{ $json.output.km_inicial }}",
+              "type": "string"
+            },
+            {
+              "id": "b050d388-9143-4cfe-9ab6-371a5af331a3",
+              "name": "km final",
+              "value": "={{ $json.output.km_final }}",
+              "type": "string"
+            },
+            {
+              "id": "d3aa3c85-8ec0-44c2-9f50-0803a7ab40a0",
+              "name": "Observaciones",
+              "value": "={{ $json.output.observaciones }}",
+              "type": "string"
+            },
+            {
+              "id": "fed0f8e8-a1cd-4193-925e-7688587151cf",
+              "name": "Trabajo realizado",
+              "value": "={{ $json.output['trabajos realizados'] }}",
+              "type": "string"
+            },
+            {
+              "id": "97feb91d-7a89-48a3-a7fb-b00927bcd3e5",
+              "name": "Nombre del operador",
+              "value": "={{ $json.output.nombre_operador }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        64
+      ],
+      "id": "511a9335-e713-45f5-8b97-290a8934463c",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3b06a5b1-cd8e-48f1-94f3-200c949e7937",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "400",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VBO-400"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "764902d5-5701-4037-bba7-474b5cd0c2d2",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "967",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ZCL-967"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6269a0a3-d8b0-485f-9e6e-24b943bb3f87",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "868",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VDM-868"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4e3c8449-ac2d-49d3-bcc4-30223d128fc8",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "618",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VOP-618"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bc180297-050c-4be3-9672-a8b5c9f9fae2",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "766",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VBS-766"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "901a5d9e-5218-48a4-aff7-97992e436a1f",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "024",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VBT-024"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "25592ff8-daff-4508-aed5-0213a4a5c659",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "756",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VBY-756"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ed4dc011-1ff8-4c57-9d5f-a564a9c68fe4",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "216",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VCV-216"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a6b0e968-3f98-4a92-a55d-88ba16db5279",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "184",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VCV-184"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "949e1f5e-d047-4942-b995-7854fec87e6d",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "862",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VCR-862"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bc96102d-32ca-4c7b-8c0a-bf9b2e5b0a58",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "184",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VCV-184"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d02bc2e3-2c70-4cbe-a03d-3d0dd0831888",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "241",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VCV-241"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3d42baae-6277-425e-bb4e-fd35f61ac682",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "217",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VCV-217"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cbfdcf89-9965-4652-aa7b-f672a7d61ea1",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "906",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "BCH-906"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8d958766-cf10-4d99-a198-8fcbf3fdc71b",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "950",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VEO-950"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5b836b58-6001-4ce0-8dcb-c9ee76f4d0d6",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "951",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "F6W-951"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9ab04a53-d411-4cf4-a41b-f388f5fea4b7",
+                    "leftValue": "={{ $json['Placa Serie'] }}",
+                    "rightValue": "127",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "VCV-127"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "allMatchingOutputs": false
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        864,
+        -192
+      ],
+      "id": "c8c6baf9-3a88-4f2c-8af1-1df8a80bbcd5",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1489542602,
+          "mode": "list",
+          "cachedResultName": "OPE-056",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1489542602"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        -480
+      ],
+      "id": "a8d98694-d3c4-4282-a9a8-e3edd13b2bc6",
+      "name": "OPE-056",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1467947424,
+          "mode": "list",
+          "cachedResultName": "OPE-008",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1467947424"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        -1456
+      ],
+      "id": "0179811f-9287-4b12-bcb0-a3a4eb569b06",
+      "name": "OPE-008",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1075220594,
+          "mode": "list",
+          "cachedResultName": "OPE-009",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1075220594"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        -1264
+      ],
+      "id": "e078709c-6c7a-40a2-827f-e47fa93a38c0",
+      "name": "OPE-009",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1924923265,
+          "mode": "list",
+          "cachedResultName": "OPE-010",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1924923265"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        -1088
+      ],
+      "id": "84381849-fb81-4c98-8795-78151ada2a93",
+      "name": "OPE-010",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1567786942,
+          "mode": "list",
+          "cachedResultName": "OPE-020",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1567786942"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        -944
+      ],
+      "id": "beb94c55-745e-4db0-bed5-9aa5830dc045",
+      "name": "OPE-020",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 126311293,
+          "mode": "list",
+          "cachedResultName": "OPE-034",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=126311293"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        -784
+      ],
+      "id": "b521137a-a230-43e7-b735-dd3731b6f149",
+      "name": "OPE-034",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1329469114,
+          "mode": "list",
+          "cachedResultName": "OPE-036",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1329469114"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        -640
+      ],
+      "id": "273a6311-0e1e-4e8d-a2c4-0612f80419c6",
+      "name": "OPE-036",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1455286325,
+          "mode": "list",
+          "cachedResultName": "OPE- 066",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1455286325"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        -320
+      ],
+      "id": "406e1072-2ec3-4169-885d-bd99d1ff7b98",
+      "name": "OPE- 066",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 363188827,
+          "mode": "list",
+          "cachedResultName": "OPE-068 A",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=363188827"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        -144
+      ],
+      "id": "817b4206-ea0d-4c99-82fe-4a85eac01112",
+      "name": "OPE-068 A",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1645112712,
+          "mode": "list",
+          "cachedResultName": "OPE- 068 B",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1645112712"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        32
+      ],
+      "id": "8f77c59f-8722-4b4a-adb2-2296875f2886",
+      "name": "OPE- 068 B",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 339725835,
+          "mode": "list",
+          "cachedResultName": "OPE- 084",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=339725835"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        224
+      ],
+      "id": "d94be1d6-1b9e-4830-981c-407e138adcf4",
+      "name": "OPE-084",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 139582198,
+          "mode": "list",
+          "cachedResultName": "OPE-086",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=139582198"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        432
+      ],
+      "id": "629eed1c-0503-49c4-85b8-52a8e3796bbe",
+      "name": "OPE-086",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 56992696,
+          "mode": "list",
+          "cachedResultName": "OPE-100",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=56992696"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        608
+      ],
+      "id": "df86be43-c5f6-4b79-9c8d-c7d5c7ec165d",
+      "name": "OPE-100",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1238559096,
+          "mode": "list",
+          "cachedResultName": "OPE-102",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1238559096"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        800
+      ],
+      "id": "08dc6744-ca0f-44c9-a382-0b08d56f5104",
+      "name": "OPE-102",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1540790385,
+          "mode": "list",
+          "cachedResultName": "OPE-106",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1540790385"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1520,
+        992
+      ],
+      "id": "a1844a26-c105-4258-92f3-bf7ea0b73e17",
+      "name": "OPE-106",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 51743893,
+          "mode": "list",
+          "cachedResultName": "OPE-SN ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=51743893"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1536,
+        1200
+      ],
+      "id": "aa88dfd3-bc16-4771-92c3-21975b20a2b7",
+      "name": "OPE-SN",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1414806360,
+          "mode": "list",
+          "cachedResultName": "CORRECION",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=1414806360"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1536,
+        1472
+      ],
+      "id": "6219a800-ca33-4424-9613-58ef510b5ab8",
+      "name": "CORRECION",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48",
+          "mode": "list",
+          "cachedResultName": "CONDUCTORES- CHECKLIST",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "OPE-002",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NpvQM1kqNqDOt8BfYQFXqs4fCalZZrErdC5QuipfA48/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha indicada": "={{ $('Edit Fields1').item.json.Fecha }}",
+            "Nombre del equipo": "={{ $('Edit Fields1').item.json['Nombre equipo'] }}",
+            "Placa/Serie": "={{ $('Edit Fields1').item.json['Placa Serie'] }}",
+            "Horas/ km inicial": "={{ $('Edit Fields1').item.json['km inicial'] }}",
+            "Horas/ km final": "={{ $('Edit Fields1').item.json['km final'] }}",
+            "Observaciones": "={{ $('Edit Fields1').item.json.Observaciones }}",
+            "Conductor": "={{ $('Edit Fields1').item.json['Nombre del operador'] }}",
+            "Turno": "={{ $('Edit Fields1').item.json.Turno }}",
+            "Hora desde": "={{ $('Edit Fields1').item.json['Hora desde'] }}",
+            "Hora hasta": "={{ $('Edit Fields1').item.json['Hora hasta'] }}",
+            "Modelo": "{{ 'FOTON' }}",
+            "Codigo": "{{ 'FOTON' }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Cel",
+              "displayName": "Cel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha enviada",
+              "displayName": "Fecha enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora enviada",
+              "displayName": "Hora enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha indicada",
+              "displayName": "Fecha indicada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora desde",
+              "displayName": "Hora desde",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora hasta",
+              "displayName": "Hora hasta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nombre del equipo",
+              "displayName": "Nombre del equipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Conductor",
+              "displayName": "Conductor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Turno",
+              "displayName": "Turno",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Placa/Serie",
+              "displayName": "Placa/Serie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Modelo",
+              "displayName": "Modelo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Codigo",
+              "displayName": "Codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km inicial",
+              "displayName": "Horas/ km inicial",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Horas/ km final",
+              "displayName": "Horas/ km final",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KM TOTALES",
+              "displayName": "KM TOTALES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Observaciones",
+              "displayName": "Observaciones",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1504,
+        -1664
+      ],
+      "id": "c7797a3d-8e13-416c-b105-5c63e094aee4",
+      "name": "OPE-002",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "q9Wz3Lyev55V97aq",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## PROCESAMIENTO POR IA",
+        "height": 416,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -32
+      ],
+      "typeVersion": 1,
+      "id": "31d40328-ac7c-4a2c-9218-3081398b8a8d",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "OPE-002",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-008",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-009",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-010",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-020",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-034",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-036",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-056",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE- 066",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-068 A",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE- 068 B",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-084",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-086",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-100",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-102",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-106",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OPE-SN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CORRECION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c9f98e51-ffbb-4c89-bee2-7d3f928523d0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "78433393f994bb46658b62aa0311e8ce3097d42d4febcbe84a2408caf59f9e19"
+  },
+  "id": "PBMW3WgogQX78LZX",
+  "tags": []
+}
